@@ -79,18 +79,32 @@ def get_sermons():
         
         # Apply search filter
         if search:
-            query = query.filter(
-                db.or_(
-                    Sermon.title.ilike(f'%{search}%'),
-                    Sermon.themes.op('?')(search),  # PostgreSQL JSON operator
-                    Sermon.date.cast(db.String).ilike(f'%{search}%')
+            # Use PostgreSQL-specific search for better performance
+            if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI']:
+                query = query.filter(
+                    db.or_(
+                        Sermon.title.ilike(f'%{search}%'),
+                        Sermon.themes.op('?')(search),  # PostgreSQL JSON operator
+                        db.func.to_tsvector('english', Sermon.title).op('@@')(db.func.plainto_tsquery('english', search))
+                    )
                 )
-            )
+            else:
+                # Fallback for SQLite (local development)
+                query = query.filter(
+                    db.or_(
+                        Sermon.title.ilike(f'%{search}%'),
+                        Sermon.date.cast(db.String).ilike(f'%{search}%')
+                    )
+                )
         
         # Apply theme filters
         if themes:
             for theme in themes:
-                query = query.filter(Sermon.themes.op('?')(theme))
+                if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI']:
+                    query = query.filter(Sermon.themes.op('?')(theme))
+                else:
+                    # Fallback for SQLite - search in JSON string
+                    query = query.filter(Sermon.themes.like(f'%"{theme}"%'))
         
         # Apply sorting
         if sort_by == 'newest':

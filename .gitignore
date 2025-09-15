@@ -63,6 +63,12 @@ debug_page.html
 Rob_Rufus_Sermons/
 sermon_metadata.json
 
+# Database files
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
 # Environment variables
 .env
 .env.local
