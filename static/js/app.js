@@ -26,6 +26,11 @@ class SermonDirectory {
     async loadStats() {
         try {
             const response = await fetch('/api/stats');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const stats = await response.json();
             
             if (stats.error) {
@@ -35,6 +40,11 @@ class SermonDirectory {
             this.updateHeaderStats(stats);
         } catch (error) {
             console.error('Error loading stats:', error);
+            // Set fallback header if stats fail to load
+            const headerStats = document.getElementById('headerStats');
+            if (headerStats) {
+                headerStats.textContent = 'Loading sermon directory...';
+            }
         }
     }
 
@@ -44,24 +54,33 @@ class SermonDirectory {
         try {
             const params = new URLSearchParams({
                 search: document.getElementById('searchInput').value,
-                sort: this.currentSort,
-                ...Object.fromEntries(this.activeFilters.entries())
+                sort: this.currentSort
+            });
+            
+            // Add theme filters as separate parameters
+            this.activeFilters.forEach(theme => {
+                params.append('themes', theme);
             });
             
             const response = await fetch(`/api/sermons?${params}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
             
             if (data.error) {
                 throw new Error(data.error);
             }
             
-            this.filteredSermons = data.sermons;
+            this.filteredSermons = data.sermons || [];
             this.renderSermons();
-            this.updateStats(data.total);
+            this.updateStats(data.total || 0);
             
         } catch (error) {
             console.error('Error loading sermons:', error);
-            this.showError('Failed to load sermons. Please try again.');
+            this.showError(`Failed to load sermons: ${error.message}`);
         } finally {
             this.setLoading(false);
         }
@@ -70,16 +89,27 @@ class SermonDirectory {
     async loadThemes() {
         try {
             const response = await fetch('/api/themes');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
             
             if (data.error) {
                 throw new Error(data.error);
             }
             
-            return data.themes;
+            return data.themes || [];
         } catch (error) {
             console.error('Error loading themes:', error);
-            return [];
+            // Return fallback themes if API fails
+            return [
+                { name: 'Grace & Gospel', count: 0 },
+                { name: 'Anointing & Power', count: 0 },
+                { name: 'Holy Spirit', count: 0 },
+                { name: 'Faith & Trust', count: 0 }
+            ];
         }
     }
 
