@@ -260,9 +260,15 @@ class SermonDirectory {
                     <a href="${this.escapeHtml(sermon.url)}" class="btn btn-primary" download>
                         <span>📥</span> Download
                     </a>
-                    <button class="btn btn-secondary" onclick="sermonDirectory.playSermon('${this.escapeHtml(sermon.url)}')">
-                        <span>▶️</span> Play
+                    <button class="btn btn-secondary" onclick="sermonDirectory.togglePlayer('${sermon.id}')">
+                        <span id="play-icon-${sermon.id}">▶️</span> <span id="play-text-${sermon.id}">Play</span>
                     </button>
+                </div>
+                <div class="audio-player" id="player-${sermon.id}" style="display: none;">
+                    <audio controls preload="metadata" id="audio-${sermon.id}">
+                        <source src="${this.escapeHtml(sermon.url)}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
                 </div>
             </div>
         `).join('');
@@ -317,9 +323,59 @@ class SermonDirectory {
         `;
     }
 
+    togglePlayer(sermonId) {
+        const player = document.getElementById(`player-${sermonId}`);
+        const playIcon = document.getElementById(`play-icon-${sermonId}`);
+        const playText = document.getElementById(`play-text-${sermonId}`);
+        const audio = document.getElementById(`audio-${sermonId}`);
+        
+        if (player.style.display === 'none') {
+            // Show player
+            player.style.display = 'block';
+            playIcon.textContent = '⏸️';
+            playText.textContent = 'Hide Player';
+            
+            // Pause any other playing audio
+            this.pauseAllOtherPlayers(sermonId);
+            
+            // Auto-play the audio
+            audio.play().catch(e => {
+                console.log('Auto-play prevented:', e);
+                // User interaction required for auto-play in some browsers
+            });
+        } else {
+            // Hide player
+            player.style.display = 'none';
+            playIcon.textContent = '▶️';
+            playText.textContent = 'Play';
+            audio.pause();
+        }
+    }
+    
+    pauseAllOtherPlayers(currentSermonId) {
+        // Pause all other audio players
+        this.filteredSermons.forEach(sermon => {
+            if (sermon.id !== currentSermonId) {
+                const audio = document.getElementById(`audio-${sermon.id}`);
+                const player = document.getElementById(`player-${sermon.id}`);
+                const playIcon = document.getElementById(`play-icon-${sermon.id}`);
+                const playText = document.getElementById(`play-text-${sermon.id}`);
+                
+                if (audio && !audio.paused) {
+                    audio.pause();
+                }
+                if (player && player.style.display !== 'none') {
+                    player.style.display = 'none';
+                    playIcon.textContent = '▶️';
+                    playText.textContent = 'Play';
+                }
+            }
+        });
+    }
+    
     playSermon(url) {
-        // This would integrate with an audio player
-        alert(`Playing: ${url}`);
+        // Fallback for direct URL play
+        window.open(url, '_blank');
     }
 
     escapeHtml(text) {

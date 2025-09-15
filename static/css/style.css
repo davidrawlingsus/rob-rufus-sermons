@@ -358,3 +358,55 @@ body {
     margin: 16px 0;
     border: 1px solid #c3e6cb;
 }
+
+/* Audio Player */
+.audio-player {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.audio-player audio {
+    width: 100%;
+    height: 40px;
+    outline: none;
+}
+
+.audio-player audio::-webkit-media-controls-panel {
+    background-color: #f8f9fa;
+}
+
+.audio-player audio::-webkit-media-controls-play-button,
+.audio-player audio::-webkit-media-controls-pause-button {
+    background-color: #667eea;
+    border-radius: 50%;
+}
+
+.audio-player audio::-webkit-media-controls-timeline {
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+
+.audio-player audio::-webkit-media-controls-current-time-display,
+.audio-player audio::-webkit-media-controls-time-remaining-display {
+    color: #495057;
+    font-size: 12px;
+}
+
+/* Audio player animations */
+.audio-player {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
