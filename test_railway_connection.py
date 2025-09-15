@@ -13,20 +13,21 @@ def test_connection():
     try:
         with app.app_context():
             # Test basic connection
-            result = db.engine.execute("SELECT 1 as test").fetchone()
-            print(f"✅ Database connection successful: {result[0]}")
-            
-            # Test PostgreSQL version
-            version = db.engine.execute("SELECT version()").fetchone()[0]
-            print(f"📊 PostgreSQL version: {version}")
+            with db.engine.connect() as conn:
+                result = conn.execute(db.text("SELECT 1 as test")).fetchone()
+                print(f"✅ Database connection successful: {result[0]}")
+                
+                # Test PostgreSQL version
+                version = conn.execute(db.text("SELECT version()")).fetchone()[0]
+                print(f"📊 PostgreSQL version: {version}")
+                
+                # Test JSONB functionality
+                result = conn.execute(db.text("SELECT '[\"test\"]'::jsonb ? 'test' as jsonb_test")).fetchone()
+                print(f"✅ JSONB support: {result[0]}")
             
             # Test if we can create tables
             db.create_all()
             print("✅ Tables created successfully")
-            
-            # Test JSONB functionality
-            result = db.engine.execute("SELECT '[\"test\"]'::jsonb ? 'test' as jsonb_test").fetchone()
-            print(f"✅ JSONB support: {result[0]}")
             
             return True
             

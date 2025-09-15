@@ -34,12 +34,13 @@ def setup_database():
             print("✅ Database tables created successfully")
             
             # Create indexes for better performance
-            db.engine.execute("""
-                CREATE INDEX IF NOT EXISTS idx_sermons_date ON sermons(date DESC);
-                CREATE INDEX IF NOT EXISTS idx_sermons_year ON sermons(year);
-                CREATE INDEX IF NOT EXISTS idx_sermons_themes ON sermons USING gin(themes);
-                CREATE INDEX IF NOT EXISTS idx_sermons_filename ON sermons(filename);
-            """)
+            with db.engine.connect() as conn:
+                conn.execute(db.text("""
+                    CREATE INDEX IF NOT EXISTS idx_sermons_date ON sermons(date DESC);
+                    CREATE INDEX IF NOT EXISTS idx_sermons_year ON sermons(year);
+                    CREATE INDEX IF NOT EXISTS idx_sermons_filename ON sermons(filename);
+                """))
+                conn.commit()
             print("✅ Database indexes created successfully")
             
             return True
@@ -128,16 +129,17 @@ def show_database_stats():
             latest = Sermon.query.order_by(Sermon.date.desc()).first()
             
             # Get theme counts using PostgreSQL JSONB queries
-            result = db.engine.execute("""
-                SELECT theme, COUNT(*) as count
-                FROM (
-                    SELECT jsonb_array_elements_text(themes) as theme
-                    FROM sermons
-                ) t
-                GROUP BY theme
-                ORDER BY count DESC
-                LIMIT 10
-            """)
+            with db.engine.connect() as conn:
+                result = conn.execute(db.text("""
+                    SELECT theme, COUNT(*) as count
+                    FROM (
+                        SELECT jsonb_array_elements_text(themes) as theme
+                        FROM sermons
+                    ) t
+                    GROUP BY theme
+                    ORDER BY count DESC
+                    LIMIT 10
+                """))
             
             print("📊 RAILWAY POSTGRESQL DATABASE STATISTICS")
             print("=" * 50)
@@ -153,15 +155,16 @@ def show_database_stats():
             print("🧪 Testing PostgreSQL JSONB queries:")
             
             # Test theme search
-            grace_count = db.engine.execute("SELECT COUNT(*) FROM sermons WHERE themes ? 'Grace & Gospel'").scalar()
-            print(f"   • Sermons with 'Grace & Gospel': {grace_count}")
-            
-            # Test full-text search
-            search_count = db.engine.execute("""
-                SELECT COUNT(*) FROM sermons 
-                WHERE to_tsvector('english', title) @@ plainto_tsquery('english', 'grace')
-            """).scalar()
-            print(f"   • Sermons with 'grace' in title: {search_count}")
+            with db.engine.connect() as conn:
+                grace_count = conn.execute(db.text("SELECT COUNT(*) FROM sermons WHERE themes ? 'Grace & Gospel'")).scalar()
+                print(f"   • Sermons with 'Grace & Gospel': {grace_count}")
+                
+                # Test full-text search
+                search_count = conn.execute(db.text("""
+                    SELECT COUNT(*) FROM sermons 
+                    WHERE to_tsvector('english', title) @@ plainto_tsquery('english', 'grace')
+                """)).scalar()
+                print(f"   • Sermons with 'grace' in title: {search_count}")
                 
     except Exception as e:
         print(f"❌ Error showing stats: {e}")

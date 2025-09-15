@@ -40,7 +40,7 @@ class Sermon(db.Model):
     title = db.Column(db.String(500), nullable=False)
     date = db.Column(db.Date, nullable=False)
     year = db.Column(db.Integer, nullable=False)
-    themes = db.Column(db.JSON, nullable=False)  # Store as JSON array
+    themes = db.Column(db.JSON, nullable=False)  # Store as JSON array (PostgreSQL will use JSONB)
     url = db.Column(db.String(500), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
