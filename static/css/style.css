@@ -1,0 +1,360 @@
+/* Mobile-first CSS for Rob Rufus Sermon Directory */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.header p {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* Search and Filters */
+.filters {
+    background: white;
+    padding: 20px 0;
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-container {
+    margin-bottom: 16px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.filter-chip {
+    padding: 8px 16px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.filter-chip:hover {
+    background: #e9ecef;
+}
+
+.filter-chip.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.more-themes-btn {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.more-themes-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.sort-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.sort-select {
+    padding: 8px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+}
+
+.stats {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Sermon List */
+.sermon-list {
+    padding: 20px 0;
+}
+
+.sermon-item {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sermon-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.sermon-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.sermon-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.sermon-date {
+    font-weight: 500;
+}
+
+.sermon-themes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.theme-tag {
+    padding: 4px 8px;
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.sermon-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+}
+
+.btn-secondary {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #e9ecef;
+}
+
+.btn-secondary:hover {
+    background: #e9ecef;
+}
+
+/* Loading and Empty States */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.empty-state h3 {
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .container {
+        padding: 0 24px;
+    }
+
+    .header h1 {
+        font-size: 32px;
+    }
+
+    .header p {
+        font-size: 16px;
+    }
+
+    .filters {
+        padding: 24px 0;
+    }
+
+    .search-input {
+        font-size: 18px;
+        padding: 16px 20px;
+    }
+
+    .sermon-item {
+        padding: 20px;
+    }
+
+    .sermon-title {
+        font-size: 18px;
+    }
+
+    .filter-chips {
+        gap: 12px;
+    }
+
+    .filter-chip {
+        padding: 10px 20px;
+        font-size: 15px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .sermon-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 20px;
+    }
+
+    .sermon-item {
+        margin-bottom: 0;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.sermon-item {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Accessibility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus styles */
+.filter-chip:focus,
+.btn:focus,
+.search-input:focus,
+.sort-select:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Error states */
+.error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 16px 0;
+    border: 1px solid #f5c6cb;
+}
+
+/* Success states */
+.success {
+    background: #d4edda;
+    color: #155724;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 16px 0;
+    border: 1px solid #c3e6cb;
+}

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rob Rufus Sermon Directory</title>
+    <style>
+        /* Mobile-first CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Search and Filters */
+        .filters {
+            background: white;
+            padding: 20px 0;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-container {
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .filter-chip:hover {
+            background: #e9ecef;
+        }
+
+        .filter-chip.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .more-themes-btn {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .more-themes-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .sort-select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .stats {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        /* Sermon List */
+        .sermon-list {
+            padding: 20px 0;
+        }
+
+        .sermon-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sermon-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .sermon-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .sermon-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .sermon-date {
+            font-weight: 500;
+        }
+
+        .sermon-themes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .theme-tag {
+            padding: 4px 8px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .sermon-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        /* Loading and Empty States */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 8px;
+            color: #495057;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .container {
+                padding: 0 24px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .filters {
+                padding: 24px 0;
+            }
+
+            .search-input {
+                font-size: 18px;
+                padding: 16px 20px;
+            }
+
+            .sermon-item {
+                padding: 20px;
+            }
+
+            .sermon-title {
+                font-size: 18px;
+            }
+
+            .filter-chips {
+                gap: 12px;
+            }
+
+            .filter-chip {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .sermon-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+                gap: 20px;
+            }
+
+            .sermon-item {
+                margin-bottom: 0;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sermon-item {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus styles */
+        .filter-chip:focus,
+        .btn:focus,
+        .search-input:focus,
+        .sort-select:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>Rob Rufus Sermon Directory</h1>
+            <p>559 sermons from 2004-2024 • Optimized thematic filters • Search & discover</p>
+        </div>
+    </div>
+
+    <div class="filters">
+        <div class="container">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search sermons by title, theme, or date...">
+            </div>
+            
+            <div class="filter-chips" id="filterChips">
+                <!-- Filter chips will be populated by JavaScript -->
+            </div>
+            
+            <div class="sort-controls">
+                <select class="sort-select" id="sortSelect">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="title">Title A-Z</option>
+                    <option value="title-desc">Title Z-A</option>
+                </select>
+                <span class="stats" id="statsDisplay">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sermon-list" id="sermonList">
+            <div class="loading">Loading sermons...</div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let allSermons = [];
+        let filteredSermons = [];
+        let activeFilters = new Set();
+        let currentSort = 'newest';
+
+        // Load sermon data
+        async function loadSermons() {
+            try {
+                const response = await fetch('sermon_metadata.json');
+                const data = await response.json();
+                allSermons = data.sermons;
+                filteredSermons = [...allSermons];
+                
+                initializeFilters();
+                renderSermons();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading sermons:', error);
+                document.getElementById('sermonList').innerHTML = 
+                    '<div class="empty-state"><h3>Error Loading Sermons</h3><p>Please check that sermon_metadata.json exists.</p></div>';
+            }
+        }
+
+        // Initialize filter chips with optimized mobile-first approach
+        function initializeFilters() {
+            const themeCounts = {};
+            allSermons.forEach(sermon => {
+                sermon.themes.forEach(theme => {
+                    themeCounts[theme] = (themeCounts[theme] || 0) + 1;
+                });
+            });
+
+            const filterChips = document.getElementById('filterChips');
+            filterChips.innerHTML = '';
+
+            // Add "All" filter
+            const allChip = createFilterChip('All', allSermons.length, true);
+            filterChips.appendChild(allChip);
+
+            // Define mobile-first optimized theme order (top 8 most useful)
+            const mobileThemes = [
+                'Grace & Gospel',
+                'Anointing & Power', 
+                'Holy Spirit',
+                'Faith & Trust',
+                'Worship & Praise',
+                'Healing & Miracles',
+                'Kingdom & Authority',
+                'Freedom & Liberation'
+            ];
+
+            // Add mobile-optimized theme filters
+            mobileThemes.forEach(theme => {
+                if (themeCounts[theme] && themeCounts[theme] > 0) {
+                    const chip = createFilterChip(theme, themeCounts[theme]);
+                    filterChips.appendChild(chip);
+                }
+            });
+
+            // Add "More" button for additional themes on larger screens
+            const moreChip = document.createElement('div');
+            moreChip.className = 'filter-chip more-themes-btn';
+            moreChip.textContent = 'More...';
+            moreChip.addEventListener('click', showMoreThemes);
+            filterChips.appendChild(moreChip);
+        }
+
+        // Show additional themes (for desktop/larger screens)
+        function showMoreThemes() {
+            const themeCounts = {};
+            allSermons.forEach(sermon => {
+                sermon.themes.forEach(theme => {
+                    themeCounts[theme] = (themeCounts[theme] || 0) + 1;
+                });
+            });
+
+            const additionalThemes = [
+                'Spiritual Warfare',
+                'Fear & Courage', 
+                'Word & Truth',
+                'Peace & Rest',
+                'Prayer & Intercession',
+                'Identity & Sonship',
+                'Joy & Happiness',
+                'Church & Ministry',
+                'Christmas & Easter',
+                'End Times & Prophecy',
+                'Discipleship & Growth',
+                'Testimonies & Reports'
+            ];
+
+            const filterChips = document.getElementById('filterChips');
+            const moreBtn = filterChips.querySelector('.more-themes-btn');
+            
+            if (moreBtn.textContent === 'More...') {
+                // Show additional themes
+                additionalThemes.forEach(theme => {
+                    if (themeCounts[theme] && themeCounts[theme] > 0) {
+                        const chip = createFilterChip(theme, themeCounts[theme]);
+                        filterChips.insertBefore(chip, moreBtn);
+                    }
+                });
+                moreBtn.textContent = 'Less...';
+            } else {
+                // Hide additional themes
+                const additionalChips = filterChips.querySelectorAll('.filter-chip:not([data-theme="All"]):not(.more-themes-btn)');
+                const mobileThemes = [
+                    'Grace & Gospel', 'Anointing & Power', 'Holy Spirit', 'Faith & Trust',
+                    'Worship & Praise', 'Healing & Miracles', 'Kingdom & Authority', 'Freedom & Liberation'
+                ];
+                
+                additionalChips.forEach(chip => {
+                    if (!mobileThemes.includes(chip.dataset.theme)) {
+                        chip.remove();
+                    }
+                });
+                moreBtn.textContent = 'More...';
+            }
+        }
+
+        // Create filter chip element
+        function createFilterChip(theme, count, isActive = false) {
+            const chip = document.createElement('div');
+            chip.className = `filter-chip ${isActive ? 'active' : ''}`;
+            chip.textContent = `${theme} (${count})`;
+            chip.dataset.theme = theme;
+            
+            chip.addEventListener('click', () => toggleFilter(theme));
+            
+            return chip;
+        }
+
+        // Toggle filter
+        function toggleFilter(theme) {
+            if (theme === 'All') {
+                activeFilters.clear();
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                    chip.classList.remove('active');
+                });
+                document.querySelector('[data-theme="All"]').classList.add('active');
+            } else {
+                if (activeFilters.has(theme)) {
+                    activeFilters.delete(theme);
+                } else {
+                    activeFilters.add(theme);
+                }
+                
+                // Update chip states
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                    chip.classList.remove('active');
+                });
+                
+                if (activeFilters.size === 0) {
+                    document.querySelector('[data-theme="All"]').classList.add('active');
+                } else {
+                    activeFilters.forEach(filter => {
+                        const chip = document.querySelector(`[data-theme="${filter}"]`);
+                        if (chip) chip.classList.add('active');
+                    });
+                }
+            }
+            
+            applyFilters();
+        }
+
+        // Apply filters and search
+        function applyFilters() {
+            let filtered = [...allSermons];
+            
+            // Apply theme filters
+            if (activeFilters.size > 0) {
+                filtered = filtered.filter(sermon => 
+                    sermon.themes.some(theme => activeFilters.has(theme))
+                );
+            }
+            
+            // Apply search
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(sermon => 
+                    sermon.title.toLowerCase().includes(searchTerm) ||
+                    sermon.themes.some(theme => theme.toLowerCase().includes(searchTerm)) ||
+                    sermon.date.includes(searchTerm)
+                );
+            }
+            
+            filteredSermons = filtered;
+            sortSermons();
+            renderSermons();
+            updateStats();
+        }
+
+        // Sort sermons
+        function sortSermons() {
+            switch (currentSort) {
+                case 'newest':
+                    filteredSermons.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'oldest':
+                    filteredSermons.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    break;
+                case 'title':
+                    filteredSermons.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+                case 'title-desc':
+                    filteredSermons.sort((a, b) => b.title.localeCompare(a.title));
+                    break;
+            }
+        }
+
+        // Render sermons
+        function renderSermons() {
+            const sermonList = document.getElementById('sermonList');
+            
+            if (filteredSermons.length === 0) {
+                sermonList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No sermons found</h3>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            sermonList.innerHTML = filteredSermons.map(sermon => `
+                <div class="sermon-item">
+                    <h3 class="sermon-title">${sermon.title}</h3>
+                    <div class="sermon-meta">
+                        <span class="sermon-date">${formatDate(sermon.date)}</span>
+                        <span class="sermon-year">${sermon.year}</span>
+                    </div>
+                    <div class="sermon-themes">
+                        ${sermon.themes.map(theme => `<span class="theme-tag">${theme}</span>`).join('')}
+                    </div>
+                    <div class="sermon-actions">
+                        <a href="${sermon.url}" class="btn btn-primary" download>
+                            <span>📥</span> Download
+                        </a>
+                        <button class="btn btn-secondary" onclick="playSermon('${sermon.url}')">
+                            <span>▶️</span> Play
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Format date for display
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Update stats display
+        function updateStats() {
+            const statsDisplay = document.getElementById('statsDisplay');
+            const total = allSermons.length;
+            const showing = filteredSermons.length;
+            
+            if (showing === total) {
+                statsDisplay.textContent = `${total} sermons`;
+            } else {
+                statsDisplay.textContent = `Showing ${showing} of ${total} sermons`;
+            }
+        }
+
+        // Play sermon (placeholder function)
+        function playSermon(url) {
+            // This would integrate with an audio player
+            alert(`Playing: ${url}`);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            sortSermons();
+            renderSermons();
+        });
+
+        // Initialize the app
+        loadSermons();
+    </script>
+</body>
+</html>

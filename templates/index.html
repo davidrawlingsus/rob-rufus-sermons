@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rob Rufus Sermon Directory</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🎵 Rob Rufus Sermon Directory</h1>
+            <p id="headerStats">Loading sermons...</p>
+        </div>
+    </div>
+
+    <div class="filters">
+        <div class="container">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search sermons by title, theme, or date...">
+            </div>
+            
+            <div class="filter-chips" id="filterChips">
+                <!-- Filter chips will be populated by JavaScript -->
+            </div>
+            
+            <div class="sort-controls">
+                <select class="sort-select" id="sortSelect">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="title">Title A-Z</option>
+                    <option value="title-desc">Title Z-A</option>
+                </select>
+                <span class="stats" id="statsDisplay">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sermon-list" id="sermonList">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading sermons...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
