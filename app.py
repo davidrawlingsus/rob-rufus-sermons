@@ -7,7 +7,7 @@ Deployable to Railway with PostgreSQL database
 import os
 import json
 from datetime import datetime, timedelta
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import logging
@@ -78,6 +78,9 @@ def generate_signed_url(bucket_name, object_name, expiration_hours=24):
     except Exception as e:
         logger.error(f"Failed to generate signed URL for {object_name}: {e}")
         return None
+
+# Initialize Google Cloud Storage client
+gcs_client = get_gcs_client()
 
 # Database Models
 class Sermon(db.Model):
@@ -275,6 +278,25 @@ def get_themes():
     except Exception as e:
         logger.error(f"Error fetching themes: {e}")
         return jsonify({'error': 'Failed to fetch themes'}), 500
+
+@app.route('/download/<int:sermon_id>')
+def download_sermon(sermon_id):
+    """Download endpoint that forces file download"""
+    try:
+        sermon = Sermon.query.get_or_404(sermon_id)
+        
+        # For now, just redirect to the existing URL
+        # The browser should handle the download with the download attribute
+        return redirect(sermon.url)
+        
+    except Exception as e:
+        logger.error(f"Error downloading sermon {sermon_id}: {e}")
+        return jsonify({'error': 'Failed to download sermon'}), 500
+
+@app.route('/test-download/<int:sermon_id>')
+def test_download(sermon_id):
+    """Test download endpoint"""
+    return jsonify({'sermon_id': sermon_id, 'message': 'test download works'})
 
 @app.route('/health')
 def health_check():

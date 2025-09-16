@@ -257,7 +257,7 @@ class SermonDirectory {
                     ${sermon.themes.map(theme => `<span class="theme-tag">${this.escapeHtml(theme)}</span>`).join('')}
                 </div>
                 <div class="sermon-actions">
-                    <a href="${this.escapeHtml(sermon.url)}" class="btn btn-primary" download>
+                    <a href="/download/${sermon.id}" class="btn btn-primary" download>
                         <span>📥</span> Download
                     </a>
                     <button class="btn btn-secondary" onclick="sermonDirectory.togglePlayer('${sermon.id}')">
