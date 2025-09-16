@@ -6,11 +6,13 @@ Deployable to Railway with PostgreSQL database
 
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import logging
+from google.cloud import storage
+from urllib.parse import urlparse
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -31,6 +33,52 @@ db = SQLAlchemy(app)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Google Cloud Storage configuration
+GCS_BUCKET_NAME = os.environ.get('GCS_BUCKET_NAME', 'rob-rufus-sermons-1757906372')
+GCS_SERVICE_ACCOUNT_KEY = os.environ.get('GCS_SERVICE_ACCOUNT_KEY')
+
+# Initialize Google Cloud Storage client
+def get_gcs_client():
+    """Get Google Cloud Storage client with service account credentials"""
+    try:
+        if GCS_SERVICE_ACCOUNT_KEY:
+            # Use service account key from environment variable
+            import json as json_lib
+            service_account_info = json_lib.loads(GCS_SERVICE_ACCOUNT_KEY)
+            client = storage.Client.from_service_account_info(service_account_info)
+        else:
+            # Use default credentials (for local development)
+            client = storage.Client()
+        return client
+    except Exception as e:
+        logger.error(f"Failed to initialize GCS client: {e}")
+        return None
+
+def generate_signed_url(bucket_name, object_name, expiration_hours=24):
+    """Generate a signed URL for a Google Cloud Storage object"""
+    try:
+        client = get_gcs_client()
+        if not client:
+            return None
+            
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(object_name)
+        
+        # Generate signed URL valid for specified hours
+        expiration = datetime.utcnow() + timedelta(hours=expiration_hours)
+        
+        signed_url = blob.generate_signed_url(
+            version="v4",
+            expiration=expiration,
+            method="GET"
+        )
+        
+        return signed_url
+        
+    except Exception as e:
+        logger.error(f"Failed to generate signed URL for {object_name}: {e}")
+        return None
+
 # Database Models
 class Sermon(db.Model):
     __tablename__ = 'sermons'
@@ -46,6 +94,28 @@ class Sermon(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     def to_dict(self):
+        # Generate signed URL for Google Cloud Storage files
+        download_url = self.url
+        
+        # Check if this is a Google Cloud Storage URL
+        if 'storage.googleapis.com' in self.url or 'gs://' in self.url:
+            # Extract object name from URL
+            if 'storage.googleapis.com' in self.url:
+                # Parse URL like: https://storage.googleapis.com/bucket-name/object-name
+                parsed_url = urlparse(self.url)
+                object_name = parsed_url.path.lstrip('/')
+                # Remove bucket name from path
+                if object_name.startswith(GCS_BUCKET_NAME + '/'):
+                    object_name = object_name[len(GCS_BUCKET_NAME) + 1:]
+            else:
+                # Parse gs:// URL like: gs://bucket-name/object-name
+                object_name = self.url.replace(f'gs://{GCS_BUCKET_NAME}/', '')
+            
+            # Generate signed URL
+            signed_url = generate_signed_url(GCS_BUCKET_NAME, object_name)
+            if signed_url:
+                download_url = signed_url
+        
         return {
             'id': self.id,
             'filename': self.filename,
@@ -53,7 +123,7 @@ class Sermon(db.Model):
             'date': self.date.isoformat(),
             'year': self.year,
             'themes': self.themes,
-            'url': self.url,
+            'url': download_url,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

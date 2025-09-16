@@ -75,3 +75,7 @@ instance/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Google Cloud service account keys
+*-key.json
+rob-rufus-sermons-key.json
