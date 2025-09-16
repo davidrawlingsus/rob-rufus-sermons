@@ -265,10 +265,27 @@ class SermonDirectory {
                     </button>
                 </div>
                 <div class="audio-player" id="player-${sermon.id}" style="display: none;">
-                    <audio controls preload="metadata" id="audio-${sermon.id}">
+                    <audio preload="metadata" id="audio-${sermon.id}">
                         <source src="${this.escapeHtml(sermon.url)}" type="audio/mpeg">
                         Your browser does not support the audio element.
                     </audio>
+                    <div class="audio-controls">
+                        <button class="play-pause-btn" id="play-pause-${sermon.id}">
+                            <span class="play-icon">▶️</span>
+                        </button>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-${sermon.id}">
+                                <div class="progress-fill" id="progress-fill-${sermon.id}"></div>
+                            </div>
+                            <div class="time-display">
+                                <span class="current-time" id="current-time-${sermon.id}">0:00</span>
+                                <span class="duration" id="duration-${sermon.id}">0:00</span>
+                            </div>
+                        </div>
+                        <button class="volume-btn" id="volume-${sermon.id}">
+                            <span class="volume-icon">🔊</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         `).join('');
@@ -338,6 +355,9 @@ class SermonDirectory {
             // Pause any other playing audio
             this.pauseAllOtherPlayers(sermonId);
             
+            // Setup audio controls for this player
+            this.setupAudioControls(sermonId);
+            
             // Auto-play the audio
             audio.play().catch(e => {
                 console.log('Auto-play prevented:', e);
@@ -350,6 +370,78 @@ class SermonDirectory {
             playText.textContent = 'Play';
             audio.pause();
         }
+    }
+    
+    setupAudioControls(sermonId) {
+        const audio = document.getElementById(`audio-${sermonId}`);
+        const playPauseBtn = document.getElementById(`play-pause-${sermonId}`);
+        const progressBar = document.getElementById(`progress-${sermonId}`);
+        const progressFill = document.getElementById(`progress-fill-${sermonId}`);
+        const currentTimeEl = document.getElementById(`current-time-${sermonId}`);
+        const durationEl = document.getElementById(`duration-${sermonId}`);
+        const volumeBtn = document.getElementById(`volume-${sermonId}`);
+        
+        // Play/Pause button
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        });
+        
+        // Progress bar click
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const width = rect.width;
+            const percentage = clickX / width;
+            audio.currentTime = percentage * audio.duration;
+        });
+        
+        // Volume button
+        volumeBtn.addEventListener('click', () => {
+            if (audio.muted) {
+                audio.muted = false;
+                volumeBtn.querySelector('.volume-icon').textContent = '🔊';
+            } else {
+                audio.muted = true;
+                volumeBtn.querySelector('.volume-icon').textContent = '🔇';
+            }
+        });
+        
+        // Audio event listeners
+        audio.addEventListener('loadedmetadata', () => {
+            durationEl.textContent = this.formatTime(audio.duration);
+        });
+        
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = `${progress}%`;
+            currentTimeEl.textContent = this.formatTime(audio.currentTime);
+        });
+        
+        audio.addEventListener('play', () => {
+            playPauseBtn.querySelector('.play-icon').textContent = '⏸️';
+        });
+        
+        audio.addEventListener('pause', () => {
+            playPauseBtn.querySelector('.play-icon').textContent = '▶️';
+        });
+        
+        audio.addEventListener('ended', () => {
+            playPauseBtn.querySelector('.play-icon').textContent = '▶️';
+            progressFill.style.width = '0%';
+            currentTimeEl.textContent = '0:00';
+        });
+    }
+    
+    formatTime(seconds) {
+        if (isNaN(seconds)) return '0:00';
+        
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
     
     pauseAllOtherPlayers(currentSermonId) {

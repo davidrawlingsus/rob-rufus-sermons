@@ -366,38 +366,140 @@ body {
     background: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e9ecef;
+    animation: slideDown 0.3s ease;
 }
 
 .audio-player audio {
-    width: 100%;
-    height: 40px;
-    outline: none;
+    display: none; /* Hide the default audio controls */
 }
 
-.audio-player audio::-webkit-media-controls-panel {
-    background-color: #f8f9fa;
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
 }
 
-.audio-player audio::-webkit-media-controls-play-button,
-.audio-player audio::-webkit-media-controls-pause-button {
-    background-color: #667eea;
+.play-pause-btn {
+    background: #667eea;
+    border: none;
     border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
-.audio-player audio::-webkit-media-controls-timeline {
-    background-color: #e9ecef;
-    border-radius: 4px;
+.play-pause-btn:hover {
+    background: #5a6fd8;
+    transform: scale(1.05);
 }
 
-.audio-player audio::-webkit-media-controls-current-time-display,
-.audio-player audio::-webkit-media-controls-time-remaining-display {
-    color: #495057;
+.play-pause-btn:active {
+    transform: scale(0.95);
+}
+
+.play-icon {
+    font-size: 16px;
+    color: white;
+}
+
+.progress-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #667eea;
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.1s ease;
+}
+
+.progress-bar:hover .progress-fill {
+    background: #5a6fd8;
+}
+
+.time-display {
+    display: flex;
+    justify-content: space-between;
     font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
 }
 
-/* Audio player animations */
-.audio-player {
-    animation: slideDown 0.3s ease;
+.current-time,
+.duration {
+    font-variant-numeric: tabular-nums;
+}
+
+.volume-btn {
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.volume-btn:hover {
+    background: #e9ecef;
+    transform: scale(1.05);
+}
+
+.volume-icon {
+    font-size: 14px;
+}
+
+/* Responsive audio controls */
+@media (max-width: 480px) {
+    .audio-controls {
+        gap: 8px;
+    }
+    
+    .play-pause-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .play-icon {
+        font-size: 14px;
+    }
+    
+    .volume-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .volume-icon {
+        font-size: 12px;
+    }
+    
+    .time-display {
+        font-size: 11px;
+    }
 }
 
 @keyframes slideDown {
