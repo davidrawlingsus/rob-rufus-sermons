@@ -347,21 +347,20 @@ class SermonDirectory {
         const audio = document.getElementById(`audio-${sermonId}`);
         
         if (player.style.display === 'none') {
-            // Show player
+            // First pause all other players
+            this.pauseAllOtherPlayers(sermonId);
+            
+            // Then show current player
             player.style.display = 'block';
             playIcon.textContent = '⏸️';
             playText.textContent = 'Hide Player';
             
-            // Pause any other playing audio
-            this.pauseAllOtherPlayers(sermonId);
-            
-            // Setup audio controls for this player
+            // Setup audio controls
             this.setupAudioControls(sermonId);
             
             // Auto-play the audio
             audio.play().catch(e => {
                 console.log('Auto-play prevented:', e);
-                // User interaction required for auto-play in some browsers
             });
         } else {
             // Hide player
@@ -458,8 +457,8 @@ class SermonDirectory {
                 }
                 if (player && player.style.display !== 'none') {
                     player.style.display = 'none';
-                    playIcon.textContent = '▶️';
-                    playText.textContent = 'Play';
+                    if (playIcon) playIcon.textContent = '▶️';
+                    if (playText) playText.textContent = 'Play';
                 }
             }
         });
